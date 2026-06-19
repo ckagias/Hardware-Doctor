@@ -121,7 +121,7 @@ export default function KeyboardPage() {
   }
 
   return (
-    <div className="page page-wide">
+    <div className="page page-wide keyboard-page">
       <h1>Keyboard Test</h1>
       <p className="page-subtitle">
         Click into this window, then press keys on your physical keyboard. Each key

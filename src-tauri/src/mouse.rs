@@ -1,6 +1,6 @@
 use parking_lot::Mutex;
 use serde::Serialize;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use tauri::{AppHandle, Emitter, State};
 
 // One mouse input (button or scroll direction), identified by a stable code
@@ -44,11 +44,13 @@ pub struct MouseSnapshot {
     tested: Vec<String>,
     tested_count: usize,
     total_count: usize,
+    counts: HashMap<String, u64>,
 }
 
 pub struct MouseState {
     pressed: Mutex<HashSet<String>>,
     tested: Mutex<HashSet<String>>,
+    counts: Mutex<HashMap<String, u64>>,
     all_buttons: HashSet<&'static str>,
 }
 
@@ -57,6 +59,7 @@ impl Default for MouseState {
         Self {
             pressed: Mutex::new(HashSet::new()),
             tested: Mutex::new(HashSet::new()),
+            counts: Mutex::new(HashMap::new()),
             all_buttons: all_buttons(),
         }
     }
@@ -65,11 +68,13 @@ impl Default for MouseState {
 fn emit_snapshot(app: &AppHandle, state: &State<MouseState>) -> Result<(), String> {
     let pressed = state.pressed.lock();
     let tested = state.tested.lock();
+    let counts = state.counts.lock();
     let snapshot = MouseSnapshot {
         pressed: pressed.iter().cloned().collect(),
         tested: tested.iter().cloned().collect(),
         tested_count: tested.len(),
         total_count: state.all_buttons.len(),
+        counts: counts.clone(),
     };
     app.emit("mouse-state", snapshot).map_err(|e| e.to_string())
 }
@@ -85,11 +90,13 @@ pub fn mouse_layout() -> MouseLayout {
 pub fn mouse_snapshot(state: State<MouseState>) -> MouseSnapshot {
     let pressed = state.pressed.lock();
     let tested = state.tested.lock();
+    let counts = state.counts.lock();
     MouseSnapshot {
         pressed: pressed.iter().cloned().collect(),
         tested: tested.iter().cloned().collect(),
         tested_count: tested.len(),
         total_count: state.all_buttons.len(),
+        counts: counts.clone(),
     }
 }
 
@@ -99,7 +106,8 @@ pub fn button_down(app: AppHandle, state: State<MouseState>, code: String) -> Re
         return Ok(());
     }
     state.pressed.lock().insert(code.clone());
-    state.tested.lock().insert(code);
+    state.tested.lock().insert(code.clone());
+    *state.counts.lock().entry(code).or_insert(0) += 1;
     emit_snapshot(&app, &state)
 }
 
@@ -123,12 +131,14 @@ pub fn scroll(app: AppHandle, state: State<MouseState>, direction: String) -> Re
     };
     state.pressed.lock().insert(code.to_string());
     state.tested.lock().insert(code.to_string());
+    *state.counts.lock().entry(code.to_string()).or_insert(0) += 1;
     emit_snapshot(&app, &state)
 }
 
 #[tauri::command]
 pub fn mouse_reset_tested(app: AppHandle, state: State<MouseState>) -> Result<(), String> {
     state.tested.lock().clear();
+    state.counts.lock().clear();
     emit_snapshot(&app, &state)
 }
 

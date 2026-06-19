@@ -1,6 +1,6 @@
 [package]
 name = "trouble"
-version = "0.3.0"
+version = "0.4.0"
 description = "A self-hosted hardware diagnostics app (microphone, headphones, and more)"
 authors = ["you"]
 edition = "2021"

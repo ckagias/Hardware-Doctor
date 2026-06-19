@@ -7,6 +7,7 @@ type MouseSnapshot = {
   tested: string[];
   testedCount: number;
   totalCount: number;
+  counts: Record<string, number>;
 };
 
 // Maps MouseEvent.button to the stable codes the backend tracks
@@ -18,6 +19,17 @@ const BUTTON_CODES: Record<number, string> = {
   4: "Forward",
 };
 
+// Order and labels for the click counter panel
+const COUNTER_ROWS: { code: string; label: string }[] = [
+  { code: "Left", label: "Left Click" },
+  { code: "Right", label: "Right Click" },
+  { code: "Middle", label: "Middle Click" },
+  { code: "Back", label: "Back" },
+  { code: "Forward", label: "Forward" },
+  { code: "ScrollUp", label: "Scroll Up" },
+  { code: "ScrollDown", label: "Scroll Down" },
+];
+
 // Scroll events have no native "up" counterpart, so the pressed flash is cleared by hand
 const SCROLL_FLASH_MS = 150;
 
@@ -26,6 +38,7 @@ export default function MousePage() {
   const [tested, setTested] = useState<Set<string>>(new Set());
   const [testedCount, setTestedCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
+  const [counts, setCounts] = useState<Record<string, number>>({});
   const [error, setError] = useState<string | null>(null);
 
   function applySnapshot(snapshot: MouseSnapshot) {
@@ -33,6 +46,7 @@ export default function MousePage() {
     setTested(new Set(snapshot.tested));
     setTestedCount(snapshot.testedCount);
     setTotalCount(snapshot.totalCount);
+    setCounts(snapshot.counts);
   }
 
   // Rust owns the pressed/tested state; this page just forwards mouse events and renders the result
@@ -130,7 +144,7 @@ export default function MousePage() {
   }
 
   return (
-    <div className="page">
+    <div className="page page-wide">
       <h1>Mouse Test</h1>
       <p className="page-subtitle">
         Click into this window, then click each mouse button, press the side buttons,
@@ -149,37 +163,49 @@ export default function MousePage() {
         </button>
       </div>
 
-      <div className="mouse-diagram">
-        <div className="mouse-outline">
-          <div className="mouse-side-buttons">
-            <div className={zoneClassNames("Back", "mouse-zone mouse-side-button")} />
-            <div className={zoneClassNames("Forward", "mouse-zone mouse-side-button")} />
-          </div>
-
-          <div className="mouse-body">
-            <div className="mouse-top-row">
-              <div className={zoneClassNames("Left", "mouse-zone mouse-click-left")}>
-                Left
-              </div>
-              <div className="mouse-center-column">
-                <div
-                  className={zoneClassNames("ScrollUp", "mouse-zone mouse-scroll-indicator")}
-                >
-                  ▲
-                </div>
-                <div className={zoneClassNames("Middle", "mouse-zone mouse-wheel")} />
-                <div
-                  className={zoneClassNames("ScrollDown", "mouse-zone mouse-scroll-indicator")}
-                >
-                  ▼
-                </div>
-              </div>
-              <div className={zoneClassNames("Right", "mouse-zone mouse-click-right")}>
-                Right
-              </div>
+      <div className="mouse-layout">
+        <div className="mouse-diagram">
+          <div className="mouse-outline">
+            <div className="mouse-side-buttons">
+              <div className={zoneClassNames("Forward", "mouse-zone mouse-side-button")} />
+              <div className={zoneClassNames("Back", "mouse-zone mouse-side-button")} />
             </div>
-            <div className="mouse-bottom" />
+
+            <div className="mouse-body">
+              <div className="mouse-top-row">
+                <div className={zoneClassNames("Left", "mouse-zone mouse-click-left")}>
+                  Left
+                </div>
+                <div className="mouse-center-column">
+                  <div
+                    className={zoneClassNames("ScrollUp", "mouse-zone mouse-scroll-indicator")}
+                  >
+                    ▲
+                  </div>
+                  <div className={zoneClassNames("Middle", "mouse-zone mouse-wheel")} />
+                  <div
+                    className={zoneClassNames("ScrollDown", "mouse-zone mouse-scroll-indicator")}
+                  >
+                    ▼
+                  </div>
+                </div>
+                <div className={zoneClassNames("Right", "mouse-zone mouse-click-right")}>
+                  Right
+                </div>
+              </div>
+              <div className="mouse-bottom" />
+            </div>
           </div>
+        </div>
+
+        <div className="mouse-counters">
+          <div className="mouse-counters-title">Click Counter</div>
+          {COUNTER_ROWS.map((row) => (
+            <div className="mouse-counter-row" key={row.code}>
+              <span className="mouse-counter-label">{row.label}</span>
+              <span className="mouse-counter-value">{counts[row.code] ?? 0}</span>
+            </div>
+          ))}
         </div>
       </div>
     </div>

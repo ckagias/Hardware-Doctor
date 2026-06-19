@@ -115,7 +115,7 @@ body {
 }
 
 /* Capped to the keyboard's width so it stays the widest element and keeps Reset pinned to its edge */
-.page-wide .page-subtitle {
+.keyboard-page .page-subtitle {
   max-width: 938px;
 }
 
@@ -298,6 +298,7 @@ button {
 }
 
 .mouse-diagram {
+  flex: 1;
   display: flex;
   justify-content: center;
   padding: 20px 0;
@@ -414,5 +415,52 @@ button {
 .mouse-zone-tested {
   background: #18301f;
   border-color: #1f4a2c;
+  color: #7ee2a8;
+}
+
+.mouse-layout {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.mouse-counters {
+  width: 220px;
+  flex-shrink: 0;
+  margin-top: 20px;
+  background: #161618;
+  border: 1px solid #27272a;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.mouse-counters-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #a1a1aa;
+  margin-bottom: 12px;
+}
+
+.mouse-counter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 0;
+  border-top: 1px solid #27272a;
+  font-size: 13px;
+}
+
+.mouse-counter-row:first-of-type {
+  border-top: none;
+}
+
+.mouse-counter-label {
+  color: #d4d4d8;
+}
+
+.mouse-counter-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
   color: #7ee2a8;
 }

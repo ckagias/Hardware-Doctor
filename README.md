@@ -22,6 +22,7 @@ If you find this useful, feel free to leave a star to help others find it!
 - Left/right/both channel test tones for headphones and speakers
 - Full 100% on-screen keyboard layout with per-key press tracking
 - Top-down mouse diagram with per-button press and tested-state tracking, including scroll and side buttons
+- Live click counter for every mouse input, reset alongside the tested state
 - Device picker with refresh for both audio modules
 - All hardware state and device I/O handled in Rust, not the browser
 
@@ -35,7 +36,7 @@ If you find this useful, feel free to leave a star to help others find it!
 | Microphone test           | Pick an input device, watch a live level meter, record and play back a short clip                                       |
 | Headphones / speakers     | Pick an output device, play a tone to the left channel, right channel, or both                                          |
 | Keyboard test             | Press keys on your physical keyboard and watch them light up on a full 100% layout, with a running count of tested keys |
-| Mouse test                | Click left/right/middle, scroll up/down, and press the side buttons                                                     |
+| Mouse test                | Click left/right/middle, scroll up/down, and press the side buttons, with a live per-input click counter                |
 | Controller test (planned) | Button and stick visualization via the Gamepad API                                                                      |
 
 
