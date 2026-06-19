@@ -3,6 +3,7 @@ import Sidebar from "./components/Sidebar";
 import MicrophonePage from "./pages/MicrophonePage";
 import HeadphonesPage from "./pages/HeadphonesPage";
 import KeyboardPage from "./pages/KeyboardPage";
+import MousePage from "./pages/MousePage";
 import ComingSoonPage from "./pages/ComingSoonPage";
 import { MODULES, ModuleId } from "./lib/modules";
 import "./App.css";
@@ -18,6 +19,8 @@ function App() {
         return <HeadphonesPage />;
       case "keyboard":
         return <KeyboardPage />;
+      case "mouse":
+        return <MousePage />;
       default: {
         const mod = MODULES.find((m) => m.id === active);
         return <ComingSoonPage label={mod?.label ?? "Coming Soon"} />;

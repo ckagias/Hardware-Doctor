@@ -29,8 +29,8 @@ export const MODULES: DeviceModule[] = [
   {
     id: "mouse",
     label: "Mouse",
-    description: "Coming soon",
-    available: false,
+    description: "Test clicks, scroll, and side buttons",
+    available: true,
   },
   {
     id: "controller",
