@@ -97,6 +97,11 @@ body {
   max-width: 560px;
 }
 
+.page-wide {
+  max-width: 1080px;
+  width: fit-content;
+}
+
 .page h1 {
   margin: 0 0 8px;
   font-size: 24px;
@@ -107,6 +112,11 @@ body {
   color: #a1a1aa;
   margin: 0 0 28px;
   line-height: 1.5;
+}
+
+/* Capped to the keyboard's width so it stays the widest element and keeps Reset pinned to its edge */
+.page-wide .page-subtitle {
+  max-width: 938px;
 }
 
 .field {
@@ -235,4 +245,54 @@ button {
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
+}
+
+.kb-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #a1a1aa;
+}
+
+/* Single grid for the whole board so it renders inside one bordered frame */
+.keyboard {
+  display: inline-grid;
+  grid-template-columns: repeat(92, 10px);
+  grid-template-rows: 58px repeat(5, 42px);
+  row-gap: 6px;
+  column-gap: 0;
+  background: #161618;
+  border: 1px solid #27272a;
+  border-radius: 10px;
+  padding: 8px;
+}
+
+.kb-key {
+  height: 36px;
+  align-self: center;
+  margin: 0 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1f1f23;
+  border: 1px solid #27272a;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #d4d4d8;
+  transition: background-color 80ms linear, border-color 80ms linear;
+  user-select: none;
+}
+
+.kb-key-pressed {
+  background: #30a46c;
+  border-color: #30a46c;
+  color: #f4f4f5;
+}
+
+.kb-key-tested {
+  background: #18301f;
+  border-color: #1f4a2c;
+  color: #7ee2a8;
 }

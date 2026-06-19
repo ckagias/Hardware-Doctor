@@ -12,12 +12,7 @@ pub struct DeviceInfo {
     pub label: String,
 }
 
-// cpal::Stream is !Send/!Sync because it wraps a platform handle, but the
-// underlying audio callback always runs on cpal's own internal thread
-// regardless of which thread holds the `Stream` value. We only ever touch
-// it from behind this Mutex, one command call at a time, so it's safe to
-// assert Send/Sync to satisfy Tauri's managed-state bound.
-// Held only to keep the stream alive (drop stops it); never read directly.
+// Wraps cpal::Stream so it can live in managed state; only used to keep the stream alive until dropped
 #[allow(dead_code)]
 struct SendStream(cpal::Stream);
 unsafe impl Send for SendStream {}

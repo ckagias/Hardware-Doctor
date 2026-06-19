@@ -23,8 +23,8 @@ export const MODULES: DeviceModule[] = [
   {
     id: "keyboard",
     label: "Keyboard",
-    description: "Coming soon",
-    available: false,
+    description: "Test every key on your keyboard",
+    available: true,
   },
   {
     id: "mouse",
