@@ -74,21 +74,19 @@ Produces `target/release/trouble.exe`. That binary alone is fully self-contained
 
 ## Releasing
 
-A Windows installer is built from `target/release/trouble.exe` via [NSIS](https://nsis.sourceforge.io/) ([makensis](https://nsis.sourceforge.io/Download)), using `installer/trouble.nsi`:
-
-```bash
-cargo build --release
-makensis /DVERSION=<version> installer\trouble.nsi
-```
-
-Produces `TroubleSetup-<version>.exe` in the repo root.
-
-This is also built automatically by [`.github/workflows/release.yml`](.github/workflows/release.yml) and attached to a GitHub Release whenever a tag matching `v*.*.*` is pushed (the tag's version must match `Cargo.toml`'s `version`, or the workflow fails):
-
-```bash
-git tag v0.5.0
-git push origin v0.5.0
-```
+1. Bump `version` in `Cargo.toml`.
+2. Build the release binary and installer:
+   ```bash
+   cargo build --release
+   makensis /DVERSION=<version> installer\trouble.nsi
+   ```
+   ([makensis](https://nsis.sourceforge.io/Download) must be installed; this produces `TroubleSetup-<version>.exe` in the repo root, alongside `target/release/trouble.exe`.)
+3. Tag the release and publish it on GitHub:
+   ```bash
+   git tag v<version>
+   git push origin v<version>
+   gh release create v<version> TroubleSetup-<version>.exe target/release/trouble.exe --title "Trouble v<version>"
+   ```
 
 ---
 
