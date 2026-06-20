@@ -1,8 +1,8 @@
 # Trouble
 
-### A self-hosted desktop app for testing your PC's hardware, built with Tauri, React, and Rust
+### A self-hosted desktop app for testing your PC's hardware, built in pure Rust
 
-[About](#about) • [Features](#features) • [Modules](#modules) • [Installation](#installation) • [Building](#building) • [Dependencies](#dependencies) • [Contributing](#contributing) • [License](#license)
+[About](#about) • [Features](#features) • [Modules](#modules) • [Installation](#installation) • [Building](#building) • [Releasing](#releasing) • [Dependencies](#dependencies) • [Contributing](#contributing) • [License](#license)
 
 ---
 
@@ -10,7 +10,7 @@
 
 A small desktop app for testing your PC's hardware: microphones, headphones/speakers, your keyboard, and your mouse. Windows' built-in troubleshooting for these is unreliable, and testing them online usually means hunting down a sketchy website. Trouble runs locally instead.
 
-Built with Tauri, React, and TypeScript on the frontend, with the hardware logic (audio I/O, keyboard state, mouse state) handled in Rust.
+Built entirely in Rust with [eframe](https://github.com/emilk/egui)/[egui](https://github.com/emilk/egui) for the UI, no browser or JS runtime involved.
 
 If you find this useful, feel free to leave a star to help others find it!
 
@@ -40,7 +40,7 @@ If you find this useful, feel free to leave a star to help others find it!
 | Controller test (planned) | Button and stick visualization via the Gamepad API                                                                      |
 
 
-The keyboard module can't capture the Windows/Super key or media keys, since the app intentionally avoids a system-wide key hook to read them.
+While Trouble's window has focus, the keyboard module reads keys through egui's own input events, which can't distinguish left/right Shift/Ctrl/Alt and has no separate Caps Lock, Windows/Super key, NumLock, ScrollLock, PrintScreen, Pause, ContextMenu, or numpad-distinct-from-main-row keys. Those specific keys are only testable while the window is unfocused, via a global low-level keyboard hook (`rdev`) that picks up the slack.
 
 ---
 
@@ -51,47 +51,65 @@ The keyboard module can't capture the Windows/Super key or media keys, since the
    git clone https://github.com/ckagias/Hardware-Doctor.git
    cd Hardware-Doctor
   ```
-2. **Install dependencies**
+2. **Run in development**
   ```bash
-   npm install
-  ```
-3. **Run in development**
-  ```bash
-   npm run tauri dev
+   cargo run
   ```
 
-Requires [Node.js](https://nodejs.org) and the [Rust toolchain](https://www.rust-lang.org/tools/install). See [Tauri's prerequisites](https://tauri.app/start/prerequisites/) for platform-specific setup.
+Requires the [Rust toolchain](https://www.rust-lang.org/tools/install). No other dependencies needed — everything else is pulled in by `cargo`.
+
+A debug build (`cargo run` / `cargo build`) shows a console window alongside the app for log output; release builds don't.
 
 ---
 
 ## Building
 
 ```bash
-npm run tauri build
+cargo build --release
 ```
 
-Produces a native installer/binary for your current platform in `src-tauri/target/release/bundle/`.
+Produces `target/release/trouble.exe`. That binary alone is fully self-contained and can be run directly without installing anything.
+
+---
+
+## Releasing
+
+A Windows installer is built from `target/release/trouble.exe` via [NSIS](https://nsis.sourceforge.io/) ([makensis](https://nsis.sourceforge.io/Download)), using `installer/trouble.nsi`:
+
+```bash
+cargo build --release
+makensis /DVERSION=<version> installer\trouble.nsi
+```
+
+Produces `TroubleSetup-<version>.exe` in the repo root.
+
+This is also built automatically by [`.github/workflows/release.yml`](.github/workflows/release.yml) and attached to a GitHub Release whenever a tag matching `v*.*.*` is pushed (the tag's version must match `Cargo.toml`'s `version`, or the workflow fails):
+
+```bash
+git tag v0.5.0
+git push origin v0.5.0
+```
 
 ---
 
 ## Dependencies
 
 
-| Package                                                 | Purpose                                 |
-| ------------------------------------------------------- | --------------------------------------- |
-| [Tauri](https://tauri.app/)                             | Desktop app shell and native bridge     |
-| [React](https://react.dev/)                             | Frontend UI                             |
-| [cpal](https://github.com/RustAudio/cpal)               | Cross-platform audio I/O                |
-| [hound](https://github.com/ruuda/hound)                 | WAV encoding for mic recordings         |
-| [parking_lot](https://github.com/Amanieu/parking_lot)   | Mutex for shared hardware state         |
-| [base64](https://github.com/marshallpierce/rust-base64) | Encodes recorded clips for the frontend |
+| Package                                                  | Purpose                                                   |
+| --------------------------------------------------------- | ----------------------------------------------------------- |
+| [eframe](https://github.com/emilk/egui)                  | Native window/app shell (winit + glow)                     |
+| [egui](https://github.com/emilk/egui)                    | Immediate-mode UI used for every panel                     |
+| [cpal](https://github.com/RustAudio/cpal)                | Cross-platform audio I/O                                   |
+| [rdev](https://github.com/narsil/rdev)                   | Global keyboard hook, used while the window is unfocused   |
+| [parking_lot](https://github.com/Amanieu/parking_lot)    | Mutex for shared hardware state                             |
+| [image](https://github.com/image-rs/image)               | Decodes the embedded app icon                               |
 
 
 ---
 
 ## Contributing
 
-PRs adding new hardware test modules are welcome. Each module lives in `src/pages/` and is registered in `src/lib/modules.ts`; backend logic lives in `src-tauri/src/`.
+PRs adding new hardware test modules are welcome. Each module lives in `src/panels/` and is registered in `src/app.rs`; the underlying hardware state (audio, keyboard, mouse) lives in `src/audio.rs`, `src/keyboard.rs`, and `src/mouse.rs`.
 
 ---
 

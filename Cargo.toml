@@ -1,0 +1,20 @@
+[package]
+name = "trouble"
+version = "0.5.0"
+description = "A self-hosted hardware diagnostics app (microphone, headphones, and more)"
+authors = ["you"]
+edition = "2021"
+
+[dependencies]
+eframe = "0.29"
+egui = "0.29"
+cpal = "0.15"
+parking_lot = "0.12"
+rdev = "0.5.3"
+image = { version = "0.25.10", default-features = false, features = ["png"] }
+# gilrs (controller support) is intentionally omitted for now -- the controller module is being
+# rebuilt from scratch; re-add when that work resumes (needs libudev-dev to build on Linux dev
+# machines, not needed on Windows where it uses XInput)
+
+[target."cfg(windows)".build-dependencies]
+winres = "0.1.12"
