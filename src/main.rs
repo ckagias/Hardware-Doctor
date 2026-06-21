@@ -2,6 +2,7 @@
 
 mod app;
 mod audio;
+mod controller;
 mod keyboard;
 mod mouse;
 mod panels;
@@ -22,7 +23,7 @@ fn load_icon() -> egui::IconData {
 fn main() -> eframe::Result<()> {
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
-            .with_inner_size([1100.0, 580.0])
+            .with_inner_size([1100.0, 640.0])
             .with_icon(load_icon()),
         ..Default::default()
     };

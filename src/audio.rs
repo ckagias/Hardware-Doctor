@@ -22,8 +22,7 @@ pub struct AudioState {
     tone_stream: Mutex<Option<SendStream>>,
     playback_stream: Mutex<Option<SendStream>>,
     mic_running: Arc<AtomicBool>,
-    // mic level (0-100), stored as u32 bits via to_bits, read each egui frame instead of
-    // pushed as a Tauri event
+    // mic level (0-100), stored as u32 bits via to_bits, read each egui frame
     mic_level_bits: Arc<AtomicU32>,
     playback_done: Arc<AtomicBool>,
 }
@@ -215,8 +214,7 @@ pub fn record_mic_clip(device_id: &str, duration_ms: u64) -> Result<RecordedClip
     })
 }
 
-// Plays back a recorded clip (mono i16 @ clip_rate) on the default output device, resampling
-// with simple linear interpolation if the output device's rate differs
+// Plays back a recorded clip (mono i16 @ clip_rate), resampling via linear interpolation if rates differ.
 pub fn play_clip(state: &AudioState, clip: &RecordedClip) -> Result<(), String> {
     *state.playback_stream.lock() = None;
     state.playback_done.store(false, Ordering::Relaxed);

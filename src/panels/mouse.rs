@@ -118,12 +118,7 @@ impl MousePanel {
         }
     }
 
-    // Recreates the v0.4.0 (pre-egui-migration) CSS mouse diagram 1:1: an outer body rect with
-    // border-radius 120/120/90/90 on a 240x410 box, a 52%-height top row holding Left/Right
-    // zones (each rounded only on its outer-top corner, like CSS `border-radius: 110px 0 0 0`)
-    // plus a center scroll column, a plain 48%-height bottom rect, and two pill side buttons
-    // overlapping the body's left edge at 32% down. All literal pixel values below are taken
-    // directly from the original App.css so the proportions match exactly.
+    // Recreates the v0.4.0 (pre-egui-migration) CSS mouse diagram 1:1; literal pixel values below are taken straight from the original App.css.
     fn draw_diagram(&self, ui: &mut egui::Ui, snapshot: &crate::mouse::MouseSnapshot) {
         let scale = 0.85;
         let body_w = 240.0 * scale;
@@ -135,8 +130,7 @@ impl MousePanel {
             ui.allocate_exact_size(egui::vec2(outline_w, outline_h), egui::Sense::hover());
         let painter = ui.painter();
 
-        // body is inset 28px from the left edge of the outline box (the side buttons occupy
-        // that left margin)
+        // Body is inset 28px from the outline's left edge; the side buttons occupy that margin.
         let body_rect = egui::Rect::from_min_size(
             egui::pos2(outline_rect.min.x + 28.0 * scale, outline_rect.min.y),
             egui::vec2(body_w, body_h),
@@ -181,8 +175,7 @@ impl MousePanel {
             egui::Stroke::new(1.0, egui::Color32::from_gray(39)),
         )));
 
-        // Left/Right zones, each rounded only on their outer top corner to match the original
-        // `border-radius: 110px 0 0 0` / `0 110px 0 0`
+        // Left/Right zones, rounded only on their outer top corner (matches the original `border-radius: 110px 0 0 0` / `0 110px 0 0`).
         let zone_radius = 130.0 * scale;
         painter.add(egui::Shape::Rect(egui::epaint::RectShape::new(
             left_zone_rect,
@@ -197,8 +190,7 @@ impl MousePanel {
             egui::Stroke::new(1.0, egui::Color32::from_gray(39)),
         )));
 
-        // bottom corners match the body's own rounding (inner_radius) so this rect's curve lines
-        // up with the body outline instead of presenting its own much-tighter corner radius
+        // Bottom corners reuse the body's own rounding so this rect's curve lines up with the body outline.
         painter.add(egui::Shape::Rect(egui::epaint::RectShape::new(
             bottom_rect,
             egui::Rounding {
@@ -234,8 +226,7 @@ impl MousePanel {
 
         painter.rect_filled(wheel_rect, 10.0 * scale, Self::zone_color(snapshot, "Middle"));
 
-        // scroll indicators are small filled triangles (not a background square with a glyph
-        // inside it), so only the arrow itself lights up rather than a square behind it
+        // Filled triangles instead of a glyph-on-square, so only the arrow itself lights up.
         let tri_w = 9.0 * scale;
         let tri_h = 7.0 * scale;
         let up_center = scroll_up_rect.center();
@@ -274,8 +265,7 @@ impl MousePanel {
             egui::Color32::from_gray(244),
         );
 
-        // side (thumb) buttons: shallow pill bulges mounted on the body's left edge at 32% down,
-        // overlapping into the body like the original's `left: 22px` against the body's `left: 28px`
+        // Side (thumb) buttons: shallow pill bulges overlapping the body's left edge, matching the original's `left: 22px` against the body's `left: 28px`.
         let side_w = 6.0 * scale;
         let side_h = 32.0 * scale;
         let side_gap = 8.0 * scale;

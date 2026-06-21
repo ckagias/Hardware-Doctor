@@ -2,10 +2,7 @@ use crate::keyboard::{self, KeyDef, KeyboardLayout, KeyboardState};
 use rdev::Key as RdKey;
 use std::sync::mpsc::{Receiver, Sender, channel};
 
-// Maps rdev's physical key enum onto the W3C KeyboardEvent.code strings used by KeyDef, so the
-// existing layout/state logic in keyboard.rs (which was written against browser key codes)
-// keeps working unchanged. rdev doesn't distinguish AltLeft/AltRight or have a few keys
-// (ContextMenu, separate numpad Insert/PageUp/etc.) that the old browser-based layout could see.
+// Maps rdev's physical key enum onto the W3C KeyboardEvent.code strings used by KeyDef. rdev can't distinguish AltLeft/AltRight and is missing a few keys (ContextMenu, separate numpad Insert/PageUp/etc).
 fn rdev_key_to_code(key: RdKey) -> Option<&'static str> {
     Some(match key {
         RdKey::Escape => "Escape",
@@ -165,12 +162,7 @@ fn draw_arrow_triangle(painter: &egui::Painter, center: egui::Pos2, direction: A
     ));
 }
 
-// Maps egui's logical Key onto the same W3C code strings, for keys pressed while the Trouble
-// window has focus. egui's Key has no left/right modifier distinction and no separate numpad
-// variants, so those keys are left to the rdev path (only reachable while unfocused -- see
-// ensure_listener). This path exists because the global rdev hook reliably stops receiving
-// events the moment Trouble's own window takes OS focus, which is whenever the user is actually
-// using the app.
+// Maps egui's logical Key onto the same W3C code strings, used while the window has focus (the rdev hook in ensure_listener stops receiving events once Trouble itself has OS focus).
 fn egui_key_to_code(key: egui::Key) -> Option<&'static str> {
     use egui::Key;
     Some(match key {
@@ -307,8 +299,7 @@ impl KeyboardPanel {
             }
         }
 
-        // Primary input path while the window has focus -- the global rdev hook above stops
-        // delivering events the moment Trouble's own window becomes the focused window.
+        // Primary input path while the window has focus, since the rdev hook stops delivering events then.
         ui.input(|input| {
             for event in &input.events {
                 if let egui::Event::Key { key, pressed, .. } = event {
@@ -373,8 +364,7 @@ impl KeyboardPanel {
                 egui::Stroke::new(1.0, egui::Color32::from_gray(20)),
             );
 
-            // arrow keys are drawn as triangles instead of unicode arrow glyphs, since egui's
-            // default embedded font doesn't include them and renders tofu boxes instead
+            // Triangles instead of unicode arrow glyphs, since egui's embedded font renders those as tofu boxes.
             if let Some(direction) = arrow_direction(def.code) {
                 draw_arrow_triangle(ui.painter(), rect.center(), direction);
             } else {

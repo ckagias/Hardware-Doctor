@@ -1,3 +1,4 @@
+pub mod controller;
 pub mod headphones;
 pub mod keyboard;
 pub mod microphone;

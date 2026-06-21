@@ -96,8 +96,7 @@ pub fn button_up(state: &MouseState, code: String) {
     state.pressed.lock().remove(&code);
 }
 
-// Scroll events have no native "up" counterpart, so this just flashes the direction as
-// pressed and marks it tested; the UI clears the flash via button_up shortly after
+// Scroll has no native "up" event, so this flashes the direction as pressed; the UI clears it via button_up shortly after.
 pub fn scroll(state: &MouseState, direction: &str) {
     let code = match direction {
         "up" => "ScrollUp",
