@@ -2,7 +2,7 @@
 
 ### A self-hosted desktop app for testing your PC's hardware, built in pure Rust
 
-[About](#about) • [Features](#features) • [Modules](#modules) • [Installation](#installation) • [Building](#building) • [Releasing](#releasing) • [Dependencies](#dependencies) • [License](#license)
+[About](#about) • [Features](#features) • [Modules](#modules) • [Download](#download) • [Installation](#installation) • [Building](#building) • [Releasing](#releasing) • [Dependencies](#dependencies) • [License](#license)
 
 ---
 
@@ -42,6 +42,17 @@ If you find this useful, feel free to leave a star to help others find it!
 
 
 While Trouble's window has focus, the keyboard module reads keys through egui's own input events, which can't distinguish left/right Shift/Ctrl/Alt and has no separate Caps Lock, Windows/Super key, NumLock, ScrollLock, PrintScreen, Pause, ContextMenu, or numpad-distinct-from-main-row keys. Those specific keys are only testable while the window is unfocused, via a global low-level keyboard hook (`rdev`) that picks up the slack.
+
+---
+
+## Download
+
+Prebuilt Windows binaries are published on the [Releases](https://github.com/ckagias/Hardware-Doctor/releases) page:
+
+- **`TroubleSetup-<version>.exe`**: installer, recommended. Installs Trouble, adds a Start Menu shortcut, and installs the Visual C++ Redistributable if it's missing.
+- **`trouble.exe`**: portable binary, no installer. Requires the [Visual C++ Redistributable](https://aka.ms/vs/17/release/vc_redist.x64.exe) to already be installed, otherwise it fails to launch with error 126.
+
+Windows SmartScreen may warn about an unrecognized publisher since the app isn't code-signed. Click **More info → Run anyway** to proceed.
 
 ---
 
