@@ -1,6 +1,6 @@
 [package]
 name = "trouble"
-version = "0.6.1"
+version = "0.7.0"
 description = "A self-hosted hardware diagnostics app (microphone, headphones, and more)"
 authors = ["you"]
 edition = "2021"
@@ -15,6 +15,7 @@ image = { version = "0.25.10", default-features = false, features = ["png"] }
 # gilrs: controller support. On Linux dev machines this needs libudev-dev installed
 # to build; on Windows it uses XInput and needs no extra system deps.
 gilrs = "0.11"
+rfd = "0.15"
 
 [target."cfg(windows)".build-dependencies]
 winres = "0.1.12"

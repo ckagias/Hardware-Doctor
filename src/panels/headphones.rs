@@ -83,7 +83,7 @@ impl HeadphonesPanel {
                     }
                 });
 
-            if ui.button("Refresh").clicked() {
+            if ui.button("Refresh").on_hover_cursor(egui::CursorIcon::PointingHand).clicked() {
                 self.refresh_devices();
             }
         });
@@ -96,23 +96,21 @@ impl HeadphonesPanel {
         ui.add_space(20.0);
 
         ui.horizontal(|ui| {
-            if ui
-                .selectable_label(self.playing == Some(Channel::Left), "Test Left")
-                .clicked()
-            {
-                self.play_channel(audio_state, Channel::Left);
-            }
-            if ui
-                .selectable_label(self.playing == Some(Channel::Both), "Test Both")
-                .clicked()
-            {
-                self.play_channel(audio_state, Channel::Both);
-            }
-            if ui
-                .selectable_label(self.playing == Some(Channel::Right), "Test Right")
-                .clicked()
-            {
-                self.play_channel(audio_state, Channel::Right);
+            for (channel, label) in [
+                (Channel::Left, "Test Left"),
+                (Channel::Both, "Test Both"),
+                (Channel::Right, "Test Right"),
+            ] {
+                let active = self.playing == Some(channel);
+                let fill = if active {
+                    egui::Color32::from_rgb(14, 116, 144)
+                } else {
+                    egui::Color32::from_gray(55)
+                };
+                let btn = egui::Button::new(label).fill(fill);
+                if ui.add(btn).on_hover_cursor(egui::CursorIcon::PointingHand).clicked() {
+                    self.play_channel(audio_state, channel);
+                }
             }
         });
 
@@ -120,6 +118,7 @@ impl HeadphonesPanel {
 
         if ui
             .add_enabled(self.playing.is_some(), egui::Button::new("Stop"))
+            .on_hover_cursor(egui::CursorIcon::PointingHand)
             .clicked()
         {
             self.stop(audio_state);

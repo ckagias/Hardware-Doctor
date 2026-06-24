@@ -282,7 +282,7 @@ impl ControllerPanel {
                 "{} / {} inputs tested",
                 snapshot.tested_count, snapshot.total_count
             ));
-            if ui.button("Reset").clicked() {
+            if ui.button("Reset").on_hover_cursor(egui::CursorIcon::PointingHand).clicked() {
                 controller::reset_tested(state);
             }
         });

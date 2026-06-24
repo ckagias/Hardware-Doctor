@@ -66,7 +66,7 @@ impl eframe::App for TroubleApp {
         egui::SidePanel::left("sidebar").show(ctx, |ui| {
             for module in Module::ALL {
                 let selected = self.active == module;
-                if ui.selectable_label(selected, module.label()).clicked() && !selected {
+                if ui.selectable_label(selected, module.label()).on_hover_cursor(egui::CursorIcon::PointingHand).clicked() && !selected {
                     // Leaving the mic tab stops the live monitor stream instead of letting it run in the background.
                     if self.active == Module::Microphone {
                         let _ = crate::audio::stop_mic_monitor(&self.audio);

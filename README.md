@@ -18,7 +18,7 @@ If you find this useful, feel free to leave a star to help others find it!
 
 ## Features
 
-- Live microphone level meter with record and playback
+- Live microphone level meter with press-to-start/stop recording, inline audio player, and WAV download
 - Left/right/both channel test tones for headphones and speakers
 - Full 100% on-screen keyboard layout with per-key press tracking
 - Top-down mouse diagram with per-button press and tested-state tracking, including scroll and side buttons
@@ -34,14 +34,12 @@ If you find this useful, feel free to leave a star to help others find it!
 
 | Module                | Description                                                                                                             |
 | --------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Microphone test       | Pick an input device, watch a live level meter, record and play back a short clip                                       |
+| Microphone test       | Pick an input device, watch a live level meter, record a clip of any length, play it back, and save it as a WAV        |
 | Headphones / speakers | Pick an output device, play a tone to the left channel, right channel, or both                                          |
 | Keyboard test         | Press keys on your physical keyboard and watch them light up on a full 100% layout, with a running count of tested keys |
 | Mouse test            | Click left/right/middle, scroll up/down, and press the side buttons, with a live per-input click counter                |
 | Controller test       | Generic gamepad diagram with button, D-pad, stick, and trigger visualization via gilrs (XInput on Windows)              |
 
-
-While Trouble's window has focus, the keyboard module reads keys through egui's own input events, which can't distinguish left/right Shift/Ctrl/Alt and has no separate Caps Lock, Windows/Super key, NumLock, ScrollLock, PrintScreen, Pause, ContextMenu, or numpad-distinct-from-main-row keys. Those specific keys are only testable while the window is unfocused, via a global low-level keyboard hook (`rdev`) that picks up the slack.
 
 ---
 
@@ -114,6 +112,7 @@ Produces `target/release/trouble.exe`. That binary alone is fully self-contained
 | [gilrs](https://gitlab.com/gilrs-project/gilrs)       | Gamepad input (XInput on Windows, evdev/libudev on Linux) |
 | [parking_lot](https://github.com/Amanieu/parking_lot) | Mutex for shared hardware state                           |
 | [image](https://github.com/image-rs/image)            | Decodes the embedded app icon                             |
+| [rfd](https://github.com/PolyMeilex/rfd)              | Native file save dialog for WAV export                    |
 
 
 ---

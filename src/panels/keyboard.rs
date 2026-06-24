@@ -2,7 +2,7 @@ use crate::keyboard::{self, KeyDef, KeyboardLayout, KeyboardState};
 use rdev::Key as RdKey;
 use std::sync::mpsc::{Receiver, Sender, channel};
 
-// Maps rdev's physical key enum onto the W3C KeyboardEvent.code strings used by KeyDef. rdev can't distinguish AltLeft/AltRight and is missing a few keys (ContextMenu, separate numpad Insert/PageUp/etc).
+// Maps rdev physical keys to W3C code strings; rdev can't distinguish AltLeft/AltRight and omits ContextMenu and numpad-distinct keys.
 fn rdev_key_to_code(key: RdKey) -> Option<&'static str> {
     Some(match key {
         RdKey::Escape => "Escape",
@@ -162,7 +162,7 @@ fn draw_arrow_triangle(painter: &egui::Painter, center: egui::Pos2, direction: A
     ));
 }
 
-// Maps egui's logical Key onto the same W3C code strings, used while the window has focus (the rdev hook in ensure_listener stops receiving events once Trouble itself has OS focus).
+// Maps egui Key to W3C code strings for the focused-window input path (rdev hook goes silent when the window has focus).
 fn egui_key_to_code(key: egui::Key) -> Option<&'static str> {
     use egui::Key;
     Some(match key {
@@ -244,6 +244,14 @@ fn egui_key_to_code(key: egui::Key) -> Option<&'static str> {
     })
 }
 
+fn update_modifier(state: &KeyboardState, code: &'static str, pressed: bool) {
+    if pressed {
+        keyboard::key_down(state, code.to_string());
+    } else {
+        keyboard::key_up(state, code.to_string());
+    }
+}
+
 enum KeyMsg {
     Down(&'static str),
     Up(&'static str),
@@ -254,6 +262,8 @@ pub struct KeyboardPanel {
     rx: Receiver<KeyMsg>,
     _tx: Sender<KeyMsg>,
     listener_started: bool,
+    prev_modifiers: egui::Modifiers,
+    prev_caps: bool,
 }
 
 impl Default for KeyboardPanel {
@@ -264,6 +274,8 @@ impl Default for KeyboardPanel {
             rx,
             _tx: tx,
             listener_started: false,
+            prev_modifiers: egui::Modifiers::default(),
+            prev_caps: false,
         }
     }
 }
@@ -299,8 +311,8 @@ impl KeyboardPanel {
             }
         }
 
-        // Primary input path while the window has focus, since the rdev hook stops delivering events then.
-        ui.input(|input| {
+        // egui input path (focused window); modifiers aren't in Event::Key so we diff input.modifiers per frame.
+        let cur_mods = ui.input(|input| {
             for event in &input.events {
                 if let egui::Event::Key { key, pressed, .. } = event {
                     if let Some(code) = egui_key_to_code(*key) {
@@ -312,7 +324,42 @@ impl KeyboardPanel {
                     }
                 }
             }
+            input.modifiers
         });
+        let prev = self.prev_modifiers;
+        if cur_mods.shift != prev.shift {
+            update_modifier(state, "ShiftLeft", cur_mods.shift);
+            update_modifier(state, "ShiftRight", cur_mods.shift);
+        }
+        if cur_mods.ctrl != prev.ctrl {
+            update_modifier(state, "ControlLeft", cur_mods.ctrl);
+            update_modifier(state, "ControlRight", cur_mods.ctrl);
+        }
+        if cur_mods.alt != prev.alt {
+            update_modifier(state, "AltLeft", cur_mods.alt);
+        }
+        if cur_mods.command != prev.command {
+            update_modifier(state, "MetaLeft", cur_mods.command);
+            update_modifier(state, "MetaRight", cur_mods.command);
+        }
+        self.prev_modifiers = cur_mods;
+
+        // CapsLock has no egui Key or Modifiers entry; poll GetKeyState(VK_CAPITAL) each frame instead.
+        #[cfg(target_os = "windows")]
+        {
+            extern "system" {
+                fn GetKeyState(n_virt_key: i32) -> i16;
+            }
+            let caps_on = (unsafe { GetKeyState(0x14) } & 0x0001) != 0;
+            if caps_on != self.prev_caps {
+                if caps_on {
+                    keyboard::key_down(state, "CapsLock".to_string());
+                } else {
+                    keyboard::key_up(state, "CapsLock".to_string());
+                }
+                self.prev_caps = caps_on;
+            }
+        }
 
         let snapshot = keyboard::keyboard_snapshot(state);
 
@@ -327,7 +374,7 @@ impl KeyboardPanel {
                 "Tested {} / {} keys",
                 snapshot.tested_count, snapshot.total_count
             ));
-            if ui.button("Reset").clicked() {
+            if ui.button("Reset").on_hover_cursor(egui::CursorIcon::PointingHand).clicked() {
                 keyboard::reset_tested(state);
             }
         });
